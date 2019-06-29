@@ -8,6 +8,7 @@ import org.apache.flink.configuration.ConfigConstants;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.configuration.TaskManagerOptions;
 import org.apache.flink.dropwizard.metrics.DropwizardHistogramWrapper;
+import org.apache.flink.metrics.jmx.JMXReporter;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.source.SourceFunction;
 
@@ -16,6 +17,8 @@ public class MetricsJob {
 	public static void main(String[] args) throws Exception {
 		ParameterTool params = ParameterTool.fromArgs(args);
 		Configuration config = new Configuration();
+		config.setString("metrics.reporters", "jmx");
+		config.setString("metrics.reporter.jmx.class", JMXReporter.class.getName());
 		config.setBoolean(ConfigConstants.LOCAL_START_WEBSERVER, true);
 		config.setInteger(TaskManagerOptions.NUM_TASK_SLOTS, 10);
 		StreamExecutionEnvironment env = StreamExecutionEnvironment.createLocalEnvironmentWithWebUI(config);
