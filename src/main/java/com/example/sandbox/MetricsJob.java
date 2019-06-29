@@ -9,6 +9,7 @@ import org.apache.flink.configuration.Configuration;
 import org.apache.flink.configuration.TaskManagerOptions;
 import org.apache.flink.dropwizard.metrics.DropwizardHistogramWrapper;
 import org.apache.flink.metrics.jmx.JMXReporter;
+import org.apache.flink.metrics.prometheus.PrometheusReporter;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.source.SourceFunction;
 
@@ -17,8 +18,12 @@ public class MetricsJob {
 	public static void main(String[] args) throws Exception {
 		ParameterTool params = ParameterTool.fromArgs(args);
 		Configuration config = new Configuration();
-		config.setString("metrics.reporters", "jmx");
+		config.setString("metrics.reporters", "jmx,prometheus");
 		config.setString("metrics.reporter.jmx.class", JMXReporter.class.getName());
+		config.setString("metrics.reporter.prometheus.class", PrometheusReporter.class.getName());
+		config.setInteger("metrics.reporter.prometheus.port", 9249);
+		config.setInteger("metrics.latency.interval", 1000);
+		config.setString("metrics.latency.granularity", "single");
 		config.setBoolean(ConfigConstants.LOCAL_START_WEBSERVER, true);
 		config.setInteger(TaskManagerOptions.NUM_TASK_SLOTS, 10);
 		StreamExecutionEnvironment env = StreamExecutionEnvironment.createLocalEnvironmentWithWebUI(config);
@@ -39,7 +44,7 @@ public class MetricsJob {
 					@Override public void cancel() {
 						running = false;
 					}
-				})
+				}).name("source").uid("source-id")
 				.map(new RichMapFunction<Long, String>() {
 					private transient DropwizardHistogramWrapper histogram;
 					private transient String lastValue;
@@ -59,8 +64,8 @@ public class MetricsJob {
 						histogram.update(duration);
 						return value.toString();
 					}
-				})
-				.print();
-		env.execute();
+				}).name("my-map").uid("my-map-id")
+				.print().name("sink").uid("sink-id");
+		env.execute("my-job");
 	}
 }
