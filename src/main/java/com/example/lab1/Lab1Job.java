@@ -31,8 +31,11 @@ public class Lab1Job {
 					}
 				})
 				.filter(event -> event.getTransactionType() != TransactionType.BLOCK)
-				.map(event -> new Report(event.getTransactionId(), event.getTransactionType(),
-						event.getTransactionId() + event.getTransactionVersion(), ReportType.NEW))
+				.map(event -> new Report(
+						event.getTransactionId(),
+						event.getTransactionType(),
+						event.getTransactionId() + "-" + event.getTransactionVersion(),
+						ReportType.NEW))
 				.print();
 
 		env.execute("lab1");
