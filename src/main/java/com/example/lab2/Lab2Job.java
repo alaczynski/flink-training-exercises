@@ -55,6 +55,6 @@ public class Lab2Job {
 				})
 				.print();
 
-		env.execute("lab1");
+		env.execute("lab");
 	}
 }

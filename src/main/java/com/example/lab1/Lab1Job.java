@@ -38,6 +38,6 @@ public class Lab1Job {
 						ReportType.NEW))
 				.print();
 
-		env.execute("lab1");
+		env.execute("lab");
 	}
 }

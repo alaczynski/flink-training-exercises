@@ -68,6 +68,6 @@ public class Lab5Job {
 					}
 				});
 
-		env.execute("lab1");
+		env.execute("lab");
 	}
 }
