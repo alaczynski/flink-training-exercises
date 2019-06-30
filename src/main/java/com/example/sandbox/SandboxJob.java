@@ -14,7 +14,6 @@ public class SandboxJob {
 		ParameterTool params = ParameterTool.fromArgs(args);
 		Configuration config = new Configuration();
 		config.setBoolean(ConfigConstants.LOCAL_START_WEBSERVER, true);
-		config.setBoolean(ConfigConstants.LOCAL_START_WEBSERVER, true);
 		config.setInteger(TaskManagerOptions.NUM_TASK_SLOTS, 10);
 		StreamExecutionEnvironment env = StreamExecutionEnvironment.createLocalEnvironmentWithWebUI(config);
 		env.getConfig().setGlobalJobParameters(params);
