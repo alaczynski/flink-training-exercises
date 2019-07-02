@@ -17,6 +17,7 @@ public class Lab3IngestionTimeJob {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setStreamTimeCharacteristic(TimeCharacteristic.IngestionTime);
+        env.getConfig().setAutoWatermarkInterval(10);
 
         DataStreamSource<TransactionEvent> reports = env.addSource(transactionEventSourceFunction(5));
         DataStreamSource<ConfirmationEvent> reportResponses = env.addSource(confirmationSourceFunction(5));
@@ -53,11 +54,12 @@ public class Lab3IngestionTimeJob {
             private boolean running;
 
             @Override
-            public void run(SourceContext<TransactionEvent> ctx) {
+            public void run(SourceContext<TransactionEvent> ctx) throws InterruptedException {
                 running = true;
                 for (int i = 0; i < amount; i++) {
-                    ctx.collect(new TransactionEvent(Integer.valueOf(i).toString(), i));
+                    ctx.collect(new TransactionEvent(String.valueOf(i), i));
                     System.out.println("sent report: " + i);
+                    sleep(500);
                     if (!running) break;
                 }
             }
@@ -77,7 +79,7 @@ public class Lab3IngestionTimeJob {
             public void run(SourceContext<ConfirmationEvent> ctx) throws InterruptedException {
                 running = true;
                 for (int i = 0; i < amount; i++) {
-                    ctx.collect(new ConfirmationEvent(Integer.valueOf(i).toString(), i));
+                    ctx.collect(new ConfirmationEvent(String.valueOf(i), i));
                     System.out.println("sent response: " + i);
                     sleep(500);
                     if (!running) break;

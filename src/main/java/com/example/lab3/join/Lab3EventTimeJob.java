@@ -70,7 +70,7 @@ public class Lab3EventTimeJob {
             public void run(SourceContext<TransactionEvent> ctx) {
                 running = true;
                 for (int i = 0; i < amount; i++) {
-                    ctx.collect(new TransactionEvent(Integer.valueOf(i).toString(), i));
+                    ctx.collect(new TransactionEvent(String.valueOf(i), i));
                     System.out.println("sent report: " + i);
                     if (!running) break;
                 }
@@ -91,7 +91,7 @@ public class Lab3EventTimeJob {
             public void run(SourceContext<ConfirmationEvent> ctx) throws InterruptedException {
                 running = true;
                 for (int i = 0; i < amount; i++) {
-                    ctx.collect(new ConfirmationEvent(Integer.valueOf(i).toString(), i));
+                    ctx.collect(new ConfirmationEvent(String.valueOf(i), i));
                     System.out.println("sent response: " + i);
                     sleep(200);
                     if (!running) break;

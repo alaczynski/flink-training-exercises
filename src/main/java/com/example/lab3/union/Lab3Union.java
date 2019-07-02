@@ -23,11 +23,11 @@ public class Lab3Union {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setStreamTimeCharacteristic(TimeCharacteristic.ProcessingTime);
 
-        SingleOutputStreamOperator<Event> reports = env.addSource(transactionEventSourceFunction(5));
-        SingleOutputStreamOperator<Event> reportResponses = env.addSource(confirmationSourceFunction(5));
+        SingleOutputStreamOperator<Event> transactionEventStream = env.addSource(transactionEventSourceFunction(5));
+        SingleOutputStreamOperator<Event> confirmationStream = env.addSource(confirmationSourceFunction(5));
 
-        reports
-                .union(reportResponses)
+        transactionEventStream
+                .union(confirmationStream)
                 .keyBy((KeySelector<Event, String>) Event::getId)
                 .process(new KeyedProcessFunction<String, Event, Report>() {
                     private transient ValueState<TransactionEvent> transactionEventState;
@@ -80,7 +80,7 @@ public class Lab3Union {
                 running = true;
                 for (int i = 0; i < amount; i++) {
 //                    sleep(new Random().nextInt(500));
-                    ctx.collect(new TransactionEvent(Integer.valueOf(i).toString()));
+                    ctx.collect(new TransactionEvent(String.valueOf(i)));
                     System.out.println("sent report: " + i);
                     if (!running) break;
                 }
@@ -102,7 +102,7 @@ public class Lab3Union {
                 running = true;
                 for (int i = 0; i < amount; i++) {
 //                    sleep(new Random().nextInt(500));
-                    ctx.collect(new ConfirmationEvent(Integer.valueOf(i).toString()));
+                    ctx.collect(new ConfirmationEvent(String.valueOf(i)));
                     System.out.println("sent response: " + i);
                     if (!running) break;
                 }
